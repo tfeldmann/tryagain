@@ -1,9 +1,16 @@
 # tryagain
 A python retry helper.
 
+<!-- MarkdownTOC -->
+
+- [Quickstart][quickstart]
+
+<!-- /MarkdownTOC -->
+
+
 ## Quickstart
 
-### Retry a function call
+### Retry calling an unstable function
 ```python
 from tryagain import retry_call
 
