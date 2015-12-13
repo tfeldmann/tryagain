@@ -7,7 +7,7 @@ except ImportError:
 setup(
     name="tryagain",
     version="0.1",
-    description="Utilities to retry Python callables.",
+    description="A simple and pythonic retry helper",
     author="Thomas Feldmann",
     author_email="info@tfeldmann.de",
     packages=["tryagain"],

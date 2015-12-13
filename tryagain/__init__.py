@@ -6,8 +6,8 @@
 #          '        |/
 #
 
-""" tryagain: A python retry helper
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+""" tryagain: A simple and pythonic retry helper
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Full documentation is at ___.
 
@@ -31,7 +31,7 @@ def _check_callable(func, allow_none=True):
             raise TypeError('{} is not callable'.format(func))
 
 
-def retry_call(func, max_attempts=None, retry_exceptions=Exception, delay=0.0,
+def retry_call(func, max_attempts=None, exceptions=Exception, wait=0.0,
                cleanup_hook=None, pre_retry_hook=None):
     """
         :param func (callable):
@@ -43,10 +43,10 @@ def retry_call(func, max_attempts=None, retry_exceptions=Exception, delay=0.0,
             Any integer number to limit the maximum number of attempts.
             Set to None for unlimited retries.
 
-        :param retry_exceptions:
+        :param exceptions:
             An iterable of exceptions that should result in a retry.
 
-        :param delay:
+        :param wait:
             Specify how many seconds
 
         :param cleanup_hook:
@@ -62,7 +62,7 @@ def retry_call(func, max_attempts=None, retry_exceptions=Exception, delay=0.0,
             No arguments are passed to this function.
             If your function requires arguments, consider defining a separate
             function or use functools.partial / a lambda function.
-            If `delay` is set, `pre_retry_hook` will be called before the
+            If `wait` is set, `pre_retry_hook` will be called before the
             waittime.
             Exceptions that are raised when calling this hook are not caught.
 
@@ -71,7 +71,7 @@ def retry_call(func, max_attempts=None, retry_exceptions=Exception, delay=0.0,
 
         :raises:
             Any exception which is
-             - not in the given `retry_exceptions`
+             - not in the given `exceptions`
              - raised in `pre_retry_hook` or in `cleanup_hook`
              - raised in the last attempt at calling `func`
     """
@@ -86,7 +86,7 @@ def retry_call(func, max_attempts=None, retry_exceptions=Exception, delay=0.0,
     for attempt, f in enumerate(repeat(func, max_attempts), start=1):
         try:
             return f()
-        except retry_exceptions as e:
+        except exceptions as e:
             if max_attempts is not None:
                 nr_display = '#{0} / {1}'.format(attempt, max_attempts)
             else:
@@ -97,8 +97,8 @@ def retry_call(func, max_attempts=None, retry_exceptions=Exception, delay=0.0,
                 cleanup_hook()
             if attempt == max_attempts:
                 raise
-            if delay:
-                time.sleep(delay)
+            if wait:
+                time.sleep(wait)
             if pre_retry_hook is not None:
                 pre_retry_hook()
 
