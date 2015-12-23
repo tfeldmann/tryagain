@@ -18,11 +18,20 @@
 import time
 import logging
 from functools import wraps
-from itertools import repeat
 logger = logging.getLogger(__name__)
 
 
-__version__ = 1.0
+__version__ = '1.0'
+
+
+def _repeat(obj, times=None):
+    # repeat(10, 3) --> 10 10 10
+    if times is None:
+        while True:
+            yield obj
+    else:
+        for i in range(times):
+            yield obj
 
 
 def _check_callable(func, allow_none=True):
@@ -83,7 +92,7 @@ def retry_call(func, max_attempts=None, exceptions=Exception, wait=0.0,
     if not (max_attempts is None or max_attempts >= 1):
         raise ValueError('max_attempts must be None or an integer >= 1')
 
-    for attempt, f in enumerate(repeat(func, max_attempts), start=1):
+    for attempt, f in enumerate(_repeat(func, max_attempts), start=1):
         try:
             return f()
         except exceptions as e:
@@ -108,26 +117,28 @@ def retry(*args, **kwargs):
 
         Wrap your function in @retriable(...) to give it retry powers!
 
-    Arguments:
-        Same as for `retry`, with the exception
-        of `action`, `args`, and `kwargs`,
-        which are left to the normal function definition.
-    Returns:
-        A function decorator
-    Example:
-        >>> count = 0
-        >>> @retry(sleeptime=0, jitter=0)
-        ... def foo():
-        ...     global count
-        ...     count += 1
-        ...     print(count)
-        ...     if count < 3:
-        ...         raise ValueError("count too small")
-        ...     return "success!"
-        >>> foo()
-        1
-        2
-        3
+        Arguments:
+            Same as for `retry`, with the exception
+            of `action`, `args`, and `kwargs`,
+            which are left to the normal function definition.
+
+        Returns:
+            A function decorator
+
+        Example:
+            >>> count = 0
+            >>> @retry(sleeptime=0, jitter=0)
+            ... def foo():
+            ...     global count
+            ...     count += 1
+            ...     print(count)
+            ...     if count < 3:
+            ...         raise ValueError("count too small")
+            ...     return "success!"
+            >>> foo()
+            1
+            2
+            3
         'success!'
     """
     def _retry_factory(func):
