@@ -57,7 +57,8 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
             An iterable of exceptions that should result in a retry.
 
         :param wait:
-            Specify the waittime before the next attempt
+            This can be an integer / float to specify the waittime in seconds
+            before the next attempt. You can also pass a function
 
         :param cleanup_hook:
             Can be set to a callable and will be called after an exception is
@@ -159,6 +160,6 @@ def retries(*args, **kwargs):
     def _retry_factory(func):
         @wraps(func)
         def _retry_wrapper(*args, **kwargs):
-            return retry_call(func, *args, **kwargs)
+            return call(func, *args, **kwargs)
         return _retry_wrapper
     return _retry_factory

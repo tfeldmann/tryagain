@@ -18,8 +18,39 @@ waittime function to realize exponential waittimes etc.
 To install, run `pip install tryagain`. (Does not work yet.)
 
 
-## Quickstart
+## Basic syntax
+```python
+import tryagain
 
+def unstable_function():
+    # Attention: This function sometimes fails!
+    ...
+
+result = tryagain.call(unstable_function,
+                       max_attempts=None, exceptions=Exception, wait=0.0,
+                       cleanup_hook=None, pre_retry_hook=None)
+```
+### Parameters
+- `func`: The unstable function to call
+- `max_attemps`: Any integer number to limit the maximum number of attempts.
+  Set to None for unlimited retries.
+- `exceptions`: An iterable of exceptions that should result in a retry.
+- `wait`:
+- `cleanup_hook`: Can be set to a callable and will be called after an
+  exception is raised from calling `func`.
+- `pre_retry_hook`: Can be set to any callable that will be called before
+  `func` is called.
+
+### Result
+`tryagain.call` will return whatever the unstable function would return.
+`tryagain.call` reraises any exception which is:
+
+- not in the given `exceptions`
+- raised in the `pre_retry_hook` or in `cleanup_hook`
+- raised in the last attempt at calling the unstable function.
+
+
+## Quickstart
 
 ### Retry calling an unstable function
 ```python
