@@ -1,8 +1,21 @@
 # tryagain
-A simple and pythonic retry helper.
-This library is currently in development.
 
-To install, run `pip install tryagain`.
+*Warning: This library is currently in development and not yet ready for
+production.*
+
+A simple and pythonic retry helper.
+
+`tryagain` aims to simplify working with unstable functions. Whether you have
+networking code that sometimes raises timeout exceptions or you are
+controlling devices which only seem to listen on the second try - `tryagain` makes it easier to repeat the call.
+
+`tryagain` offers you hooks to clean up after a failed attempt or to prepare
+for the next call. You can set a waittime between retries or specify your own
+waittime function to realize exponential waittimes etc.
+
+`tryagain` is lightweight, fully tested, MIT licensed and comes as a single python file with no dependencies.
+
+To install, run `pip install tryagain`. (Does not work yet.)
 
 
 ## Quickstart
@@ -10,19 +23,19 @@ To install, run `pip install tryagain`.
 
 ### Retry calling an unstable function
 ```python
-from tryagain import retry_call
+import tryagain
 
 def unstable():
     ...
 
 # retry calling 'unstable' until it returns without raising an exception
-retry_call(unstable)
+tryagain.call(unstable)
 
 # limit to maximum 5 attempts
-retry_call(unstable, max_attempts=5)
+tryagain.call(unstable, max_attempts=5)
 
 # only retry after specific exceptions
-retry_call(unstable, exceptions=[ValueError, TypeError])
+tryagain.call(unstable, exceptions=[ValueError, TypeError])
 ```
 
 
@@ -32,19 +45,19 @@ functions.
 
 ```python
 # wait one second before trying again
-retry_call(unstable, wait=1.0)
+tryagain.call(unstable, wait=1.0)
 
 # waittime rises linearly (n is the number of attempts)
 # (will wait 1s, 2s, 3s, ...)
-retry_call(unstable, wait=lambda n: n)
+tryagain.call(unstable, wait=lambda n: n)
 
 # waittime rises exponentially with each attempt
 # (will wait 2s, 4s, 8s, ...)
-retry_call(unstable, wait=lambda n: 2 ** n)
+tryagain.call(unstable, wait=lambda n: 2 ** n)
 
 # exponentially rising waittime with maximum
 # (will wait 2s, 4s, 5s, 5s, ..., 5s)
-retry_call(unstable, wait=lambda n: min(n ** 2, 5))
+tryagain.call(unstable, wait=lambda n: min(n ** 2, 5))
 
 # no waiting time before second attempt, 1.0s afterwards
 def no_first_wait(attempt):
@@ -52,35 +65,35 @@ def no_first_wait(attempt):
         return 0
     else:
         return 1.0
-retry_call(unstable, wait=no_first_wait)
+tryagain.call(unstable, wait=no_first_wait)
 ```
 
 
 ### Retry calling a function with parameters
 ```python
 # using a lambda
-retry_call(lambda: unstable('message', underscores=True), wait=1.0)
+tryagain.call(lambda: unstable('message', some_arg=True), wait=1.0)
 
 # using a partial
 from functools import partial
-retry_call(partial(unstable, 'message', underscores=True), wait=1.0)
+tryagain.call(partial(unstable, 'message', some_arg=True), wait=1.0)
 
 # using a separate function
 def call_unstable_function():
     msg = 'message'
-    return unstable(msg, underscores=True)
-retry_call(call_unstable_function, wait=1.0)
+    return unstable(msg, some_arg=True)
+tryagain.call(call_unstable_function, wait=1.0)
 
 # using the 'args' and 'kwargs' parameters
-retry_call(unstable, args=['message'], kwargs={'underscores': True}, wait=1.0)
+tryagain.call(unstable, args=['message'], kwargs={'some_arg': True}, wait=1.0)
 ```
 
 
 ### Function decorator
 ```python
-from tryagain import retry
+from tryagain import retries
 
-@retry(max_attempts=3)
+@retries(max_attempts=3)
 def unstable():
 ```
 
@@ -96,10 +109,10 @@ def unstable():
     raise Exception
 # TODO: Optional variable attempts in wait und hooks!
 
-retry_call(unstable, max_attempts=2,
-           wait=lambda n: print('waiting'),
-           cleanup_hook=lambda: print('cleaning up'),
-           pre_retry_hook=lambda: print('do preparations'))
+tryagain.call(unstable, max_attempts=2,
+              wait=lambda n: print('waiting'),
+              cleanup_hook=lambda: print('cleaning up'),
+              pre_retry_hook=lambda: print('do preparations'))
 'Calling unstable function'
 # [our unstable function raised an exception]
 'cleaning up'
