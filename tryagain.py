@@ -42,7 +42,7 @@ def _assert_callable(func, allow_none=True):
             raise TypeError('{} is not callable'.format(func))
 
 
-def call(func, *, max_attempts=None, exceptions=Exception, wait=0.0,
+def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
          cleanup_hook=None, pre_retry_hook=None):
     """ :param func (callable):
             The function to retry. No arguments are passed to this function.
