@@ -38,7 +38,7 @@ def _repeat(obj, times=None):
 def _assert_callable(func, allow_none=True):
     if not (func is None and allow_none):
         if not callable(func):
-            raise TypeError('{} is not callable'.format(func))
+            raise TypeError('{0} is not callable'.format(func))
 
 
 def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
@@ -101,7 +101,7 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
 
     def log_failed_attempt(attempt, error):
         if max_attempts is None:
-            nr_display = '{}'.format(attempt)
+            nr_display = '{0}'.format(attempt)
         else:
             nr_display = '{0} / {1}'.format(attempt, max_attempts)
         logger.debug('Attempt {nr} at calling {func} failed ({msg})'
