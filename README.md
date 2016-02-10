@@ -1,7 +1,9 @@
 # tryagain
 
-*Warning: This library is currently in development and not yet ready for
-production.*
+__*Warning: This library is currently in development and not yet ready for
+production.*__
+
+[![Build Status](https://travis-ci.org/tfeldmann/tryagain.svg?branch=master)](https://travis-ci.org/tfeldmann/tryagain)
 
 A simple and pythonic retry helper.
 
