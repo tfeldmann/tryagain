@@ -52,16 +52,6 @@ def test_detect_invalid_wait_function():
         tryagain.call(_return_true, wait=lambda too, many, arguments: None)
 
 
-def test_detect_invalid_cleanup_hook():
-    with pytest.raises(ValueError):
-        tryagain.call(_return_true, cleanup_hook=lambda somearg: None)
-
-
-def test_detect_invalid_pre_retry_hook():
-    with pytest.raises(ValueError):
-        tryagain.call(_return_true, pre_retry_hook=lambda somearg: None)
-
-
 def test_repeat():
     assert (
         list(tryagain._repeat('x', times=10)) ==
@@ -73,7 +63,7 @@ def test_is_callable():
         tryagain._assert_callable(None, allow_none=False)
     with pytest.raises(TypeError):
         tryagain._assert_callable(3, allow_none=True)
-    assert tryagain._assert_callable(_return_true)
+    assert tryagain._assert_callable(_return_true) is None
     assert tryagain._assert_callable(lambda: None) is None
 
 
