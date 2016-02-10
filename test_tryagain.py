@@ -4,6 +4,7 @@ import logging
 import tryagain
 import functools
 
+# TODO: test with uncallable hooks, function and wait func
 
 counter = 0
 
@@ -45,11 +46,6 @@ def test_custom_wait_function():
         assert tryagain.call(
             _always_raise_exception, wait=mywait, max_attempts=2) is None
     assert counter == 1
-
-
-def test_detect_invalid_wait_function():
-    with pytest.raises(ValueError):
-        tryagain.call(_return_true, wait=lambda too, many, arguments: None)
 
 
 def test_repeat():

@@ -15,7 +15,6 @@
 """
 import time
 import logging
-import inspect
 import functools
 logger = logging.getLogger('tryagain')
 
@@ -98,11 +97,7 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
     # a function which always returns this fixed value. This way we avoid
     # having to make this decision in the retry loop.
     wait_func = wait if type(wait) not in [int, float] else lambda _: wait
-
-    # check if our wait_func is a function with a single argument
-    if len(inspect.signature(wait_func).parameters) != 1:
-        raise ValueError(
-            'The wait function must be a function with a single argument')
+    _assert_callable(wait_func, allow_none=False)
 
     def log_failed_attempt(attempt, error):
         if max_attempts is None:
