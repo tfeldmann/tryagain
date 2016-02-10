@@ -3,7 +3,10 @@
 __*Warning: This library is currently in development and not yet ready for
 production.*__
 
-[![Build Status](https://travis-ci.org/tfeldmann/tryagain.svg?branch=master)](https://travis-ci.org/tfeldmann/tryagain)
+| branch  | build status                   |
+|---------|--------------------------------|
+|  master | ![Build Status][build-master]  |
+| develop | ![Build Status][build-develop] |
 
 A simple and pythonic retry helper.
 
@@ -156,3 +159,7 @@ tryagain.call(unstable, max_attempts=2,
 'cleaning up'
 Error: Exception raised...
 ```
+
+
+[build-develop]: https://travis-ci.org/tfeldmann/tryagain.svg?branch=develop
+[build-master]: https://travis-ci.org/tfeldmann/tryagain.svg?branch=master
