@@ -16,7 +16,7 @@
 import time
 import logging
 import inspect
-from functools import wraps
+import functools
 logger = logging.getLogger('tryagain')
 
 
@@ -42,7 +42,7 @@ def _assert_callable(func, allow_none=True):
             raise TypeError('{} is not callable'.format(func))
 
 
-def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
+def call(func, *, max_attempts=None, exceptions=Exception, wait=0.0,
          cleanup_hook=None, pre_retry_hook=None):
     """ :param func (callable):
             The function to retry. No arguments are passed to this function.
@@ -128,38 +128,11 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
                 pre_retry_hook()
 
 
-def retries(*args, **kwargs):
-    """ A decorator factory for tryagain.call().
+def retries(a, b):
+    def decorator(func):
+        @functools.wraps(func)
+        def f(a, b):
+            return call(func, a=a, b=b)
+        return f
 
-        Wrap your function in @retries(...) to give it retry powers!
-
-        Arguments:
-            Same as for `retry`, with the exception
-            of `action`, `args`, and `kwargs`,
-            which are left to the normal function definition.
-
-        Returns:
-            A function decorator
-
-        Example:
-            >>> count = 0
-            >>> @retry(sleeptime=0, jitter=0)
-            ... def foo():
-            ...     global count
-            ...     count += 1
-            ...     print(count)
-            ...     if count < 3:
-            ...         raise ValueError("count too small")
-            ...     return "success!"
-            >>> foo()
-            1
-            2
-            3
-        'success!'
-    """
-    def _retry_factory(func):
-        @wraps(func)
-        def _retry_wrapper(*args, **kwargs):
-            return call(func, *args, **kwargs)
-        return _retry_wrapper
-    return _retry_factory
+    return decorator
