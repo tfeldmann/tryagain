@@ -70,6 +70,10 @@ def test_attempts():
     assert tryagain.call(_return_true, max_attempts=1)
 
 
+def test_unexpected_exception():
+    pass
+
+
 class Namespace:
     pass
 
@@ -108,21 +112,22 @@ def test_full_execution():
     assert result == 'result 3'
 
 
+class reprwrapper(object):
+    def __init__(self, repr, func):
+        self._repr = repr
+        self._func = func
+        functools.update_wrapper(self, func)
+
+    def __call__(self, *args, **kw):
+        return self._func(*args, **kw)
+
+    def __repr__(self):
+        return self._repr
+
+
 def test_logging():
     ns = Namespace()
     ns.count = 0
-
-    class reprwrapper(object):
-        def __init__(self, repr, func):
-            self._repr = repr
-            self._func = func
-            functools.update_wrapper(self, func)
-
-        def __call__(self, *args, **kw):
-            return self._func(*args, **kw)
-
-        def __repr__(self):
-            return self._repr
 
     def unstable():
         ns.count += 1
@@ -138,3 +143,80 @@ def test_logging():
         assert tryagain.call(wrapped_unstable) is True
         mock_debug.assert_called_once_with(
            'Attempt 1 at calling unstable failed (Exception message)')
+
+
+def test_logging_limited_attempts():
+    ns = Namespace()
+    ns.count = 0
+
+    def unstable():
+        ns.count += 1
+        if ns.count == 2:
+            return True
+        else:
+            raise Exception('Exception message')
+
+    wrapped_unstable = reprwrapper('unstable', unstable)
+
+    logger = logging.getLogger('tryagain')
+    with mock.patch.object(logger, 'debug') as mock_debug:
+        assert tryagain.call(wrapped_unstable, max_attempts=5) is True
+        mock_debug.assert_called_once_with(
+           'Attempt 1 / 5 at calling unstable failed (Exception message)')
+
+
+def test_decorator():
+    ns = Namespace()
+    ns.count = 0
+
+    @tryagain.retries()
+    def unstable():
+        ns.count += 1
+        if ns.count == 2:
+            return True
+        else:
+            raise Exception('Exception message')
+
+    assert tryagain.call(unstable)
+
+
+def test_decorator_with_parameters():
+    ns = Namespace()
+    ns.count = 0
+
+    @tryagain.retries(max_attempts=5)
+    def unstable():
+        ns.count += 1
+        if ns.count == 2:
+            return True
+        else:
+            raise Exception('Exception message')
+
+    assert tryagain.call(unstable)
+
+
+def test_decorator_in_class():
+    pass
+
+
+def test_decorator_hooks():
+    pass
+
+
+def test_decorator_fails():
+    ns = Namespace()
+    ns.count = 0
+
+    @tryagain.retries(max_attempts=5)
+    def unstable(pass_on_count=2):
+        ns.count += 1
+        if ns.count == pass_on_count:
+            return True
+        else:
+            raise Exception('Exception message')
+
+    with pytest.raises(Exception):
+        unstable(pass_on_count=10)
+
+    ns.count = 0
+    assert unstable(pass_on_count=2) is True

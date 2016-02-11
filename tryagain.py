@@ -123,11 +123,11 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
                 pre_retry_hook()
 
 
-def retries(a, b):
-    def decorator(func):
+def retries(*deco_args, **deco_kwargs):
+    def retries_decorator(func):
         @functools.wraps(func)
-        def f(a, b):
-            return call(func, a=a, b=b)
-        return f
-
-    return decorator
+        def func_wrapper(*args, **kwargs):
+            return call(
+                lambda: func(*args, **kwargs), *deco_args, **deco_kwargs)
+        return func_wrapper
+    return retries_decorator
