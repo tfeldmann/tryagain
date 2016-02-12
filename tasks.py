@@ -9,12 +9,12 @@ def test():
 
 
 @task
-def release(production=False):
+def register(production=False):
     target = 'pypi' if production else 'pypitest'
     os.system('python3 setup.py register -r %s' % target)
 
 
 @task
-def upload(production=True):
+def upload(production=False):
     target = 'pypi' if production else 'pypitest'
     os.system('python3 setup.py bdist_wheel upload -r %s' % target)

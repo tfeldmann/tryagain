@@ -6,8 +6,6 @@
 Welcome to tryagain's documentation!
 ====================================
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
 

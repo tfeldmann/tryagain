@@ -5,9 +5,6 @@ tryagain
 
 A lightweight and pythonic retry helper.
 
-***Warning: This library is currently in development and not yet ready
-for production.***
-
 ``tryagain`` aims to simplify working with unstable functions. Whether
 you have networking code that sometimes raises timeout exceptions or you
 are controlling devices which only seem to listen on the second try -

@@ -19,7 +19,7 @@ import functools
 logger = logging.getLogger('tryagain')
 
 
-__version__ = '1.0'
+__version__ = '0.9'
 
 
 # this code is taken from the itertools.repeat documentation. The function
