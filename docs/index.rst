@@ -11,7 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. autofunction:: tryagain.retry_call
+.. autofunction:: tryagain.call
 
 
 Indices and tables

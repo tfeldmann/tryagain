@@ -57,7 +57,8 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
 
         :param wait:
             This can be an integer / float to specify the waittime in seconds
-            before the next attempt. You can also pass a function
+            before the next attempt. You can also pass a function which accepts
+            a single argument 'attempt'.
 
         :param cleanup_hook:
             Can be set to a callable and will be called after an exception is
