@@ -1,14 +1,10 @@
+[![Build Status](https://travis-ci.org/tfeldmann/tryagain.svg?branch=develop)](https://travis-ci.org/tfeldmann/tryagain)
 # tryagain
+
+A simple and pythonic retry helper.
 
 __*Warning: This library is currently in development and not yet ready for
 production.*__
-
-| branch  | build status                   |
-|---------|--------------------------------|
-|  master | ![Build Status][build-master]  |
-| develop | ![Build Status][build-develop] |
-
-A simple and pythonic retry helper.
 
 `tryagain` aims to simplify working with unstable functions. Whether you have
 networking code that sometimes raises timeout exceptions or you are
