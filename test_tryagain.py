@@ -4,7 +4,9 @@ import logging
 import tryagain
 import functools
 
-# TODO: test with uncallable hooks, function and wait func
+# TODO:
+# - test with uncallable hooks, function and wait func
+# - test exceptions in hooks
 
 counter = 0
 
@@ -70,10 +72,6 @@ def test_attempts():
     assert tryagain.call(_return_true, max_attempts=1)
 
 
-def test_unexpected_exception():
-    pass
-
-
 class Namespace:
     pass
 
@@ -104,6 +102,41 @@ def test_full_execution():
 
     result = tryagain.call(unstable, wait=wait, max_attempts=5,
                            cleanup_hook=cleanup, pre_retry_hook=pre_retry)
+    print(actions)
+    assert actions == [
+        'fail 1', 'cleanup 1', 'wait 1', 'pre_retry 1',
+        'fail 2', 'cleanup 2', 'wait 2', 'pre_retry 2',
+        'success 3']
+    assert result == 'result 3'
+
+
+def test_full_execution_decorator():
+    ns = Namespace()
+    actions = []
+    ns.count = 0
+
+    def cleanup():
+        actions.append('cleanup %s' % ns.count)
+
+    def pre_retry():
+        actions.append('pre_retry %s' % ns.count)
+
+    def wait(attempt):
+        actions.append('wait %s' % attempt)
+        return 0
+
+    @tryagain.retries(wait=wait, max_attempts=5,
+                      cleanup_hook=cleanup, pre_retry_hook=pre_retry)
+    def unstable():
+        ns.count += 1
+        if ns.count == 3:
+            actions.append('success %s' % ns.count)
+            return 'result %s' % ns.count
+        else:
+            actions.append('fail %s' % ns.count)
+            raise Exception
+
+    result = unstable()
     print(actions)
     assert actions == [
         'fail 1', 'cleanup 1', 'wait 1', 'pre_retry 1',
@@ -196,11 +229,26 @@ def test_decorator_with_parameters():
 
 
 def test_decorator_in_class():
-    pass
 
+    class MyClass:
 
-def test_decorator_hooks():
-    pass
+        def __init__(self):
+            self.count = 0
+
+        @tryagain.retries(max_attempts=5)
+        def unstable(self, pass_on_count):
+            self.count += 1
+            if self.count == pass_on_count:
+                return True
+            else:
+                raise Exception('Exception message')
+
+    with pytest.raises(Exception):
+        c1 = MyClass()
+        c1.unstable(pass_on_count=10)
+
+    c2 = MyClass()
+    assert c2.unstable(pass_on_count=2) is True
 
 
 def test_decorator_fails():
@@ -220,3 +268,13 @@ def test_decorator_fails():
 
     ns.count = 0
     assert unstable(pass_on_count=2) is True
+
+
+def test_unexpected_exception():
+
+    @tryagain.retries(max_attempts=5)
+    def unstable():
+        raise EnvironmentError()
+
+    with pytest.raises(EnvironmentError):
+        unstable()

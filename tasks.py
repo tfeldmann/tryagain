@@ -9,12 +9,12 @@ def test():
 
 
 @task
-def release(test=True):
-    target = 'pypitest' if test else 'pypi'
+def release(production=False):
+    target = 'pypi' if production else 'pypitest'
     os.system('python3 setup.py register -r %s' % target)
 
 
 @task
-def upload(test=True):
-    target = 'pypitest' if test else 'pypi'
+def upload(production=True):
+    target = 'pypi' if production else 'pypitest'
     os.system('python3 setup.py bdist_wheel upload -r %s' % target)

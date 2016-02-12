@@ -45,7 +45,7 @@ Parameters
    attempts. Set to None for unlimited retries.
 -  ``exceptions``: An iterable of exceptions that should result in a
    retry.
--  ``wait``:
+-  ``wait``: Can be an integer or float value (to specify a waittime in seconds) or a custom function (see Waittime documentation)
 -  ``cleanup_hook``: Can be set to a callable and will be called after
    an exception is raised from calling ``func``.
 -  ``pre_retry_hook``: Can be set to any callable that will be called
@@ -156,20 +156,20 @@ The tryagain library features two hooks that can be used,
 
     def unstable():
         print('Calling unstable function')
+        print('Exception!')
         raise Exception
-    # TODO: Optional variable attempts in wait und hooks!
 
     tryagain.call(unstable, max_attempts=2,
                   wait=lambda n: print('waiting'),
                   cleanup_hook=lambda: print('cleaning up'),
                   pre_retry_hook=lambda: print('do preparations'))
     'Calling unstable function'
-    # [our unstable function raised an exception]
+    'Exception!'
     'cleaning up'
     'waiting'
     'do preparations'
     'Calling unstable function'
-    # [our unstable function raised an exception]
+    'Exception!'
     'cleaning up'
     Error: Exception raised...
 
