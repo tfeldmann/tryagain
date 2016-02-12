@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/tfeldmann/tryagain.svg?branch=develop)](https://travis-ci.org/tfeldmann/tryagain)
-[![Coverage Status](https://coveralls.io/repos/github/tfeldmann/tryagain/badge.svg?branch=master)](https://coveralls.io/github/tfeldmann/tryagain?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/tfeldmann/tryagain/badge.svg?branch=develop)](https://coveralls.io/github/tfeldmann/tryagain?branch=develop)
 
 # tryagain
 
