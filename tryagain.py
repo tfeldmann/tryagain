@@ -53,7 +53,8 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
             Set to None for unlimited retries.
 
         :param exceptions:
-            A tuple of exceptions that should result in a retry.
+            A tuple of exceptions that should result in a retry. Catches
+            everything derived from 'Exception' by default.
 
         :param wait:
             This can be an integer / float to specify the waittime in seconds

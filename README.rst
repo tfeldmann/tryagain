@@ -19,8 +19,10 @@ single python file with no dependencies.
 
 To install, run ``pip install tryagain``.
 
+
 Basic syntax
 ------------
+Using the tryagain function ``call``:
 
 .. code:: python
 
@@ -34,29 +36,46 @@ Basic syntax
                            max_attempts=None, exceptions=Exception, wait=0.0,
                            cleanup_hook=None, pre_retry_hook=None)
 
+Using the tryagain decorator ``retries``:
+
+.. code:: python
+
+    from tryagain import retries
+
+    @retries(max_attempts=3)
+    def unstable_funcation(arg1, arg2):
+        # Attention: This function sometimes fails!
+        ...
+
+    result = unstable_function('foo', arg2='bar')
+
+
 Parameters
 ~~~~~~~~~~
 
 -  ``func``: The unstable function to call
 -  ``max_attemps``: Any integer number to limit the maximum number of
-   attempts. Set to None for unlimited retries.
+   attempts. Set to None for unlimited retries. (Default = None)
 -  ``exceptions``: An iterable of exceptions that should result in a
-   retry.
--  ``wait``: Can be an integer or float value (to specify a waittime in seconds) or a custom function (see Waittime documentation)
+   retry. (Default = ``Exception``)
+-  ``wait``: Can be an integer or float value (to specify a waittime in seconds) or a custom function (see Waittime documentation) (Default = 0.0)
 -  ``cleanup_hook``: Can be set to a callable and will be called after
-   an exception is raised from calling ``func``.
+   an exception is raised from calling ``func``. (Default = None)
 -  ``pre_retry_hook``: Can be set to any callable that will be called
-   before ``func`` is called.
+   before ``func`` is called. (Default = None)
+
 
 Result
 ~~~~~~
 
 ``tryagain.call`` will return whatever the unstable function would
-return. ``tryagain.call`` reraises any exception which is:
+return. ``tryagain.call`` (and the decorator ``tryagain.retries``) reraises
+any exception which is:
 
 -  not in the given ``exceptions``
 -  raised in the ``pre_retry_hook`` or in ``cleanup_hook``
 -  raised in the last attempt at calling the unstable function.
+
 
 Quickstart
 ----------
@@ -72,13 +91,14 @@ Retry calling an unstable function
         ...
 
     # retry calling 'unstable' until it returns without raising an exception
-    tryagain.call(unstable)
+    result = tryagain.call(unstable)
 
     # limit to maximum 5 attempts
-    tryagain.call(unstable, max_attempts=5)
+    result = tryagain.call(unstable, max_attempts=5)
 
     # only retry after specific exceptions
-    tryagain.call(unstable, exceptions=(ValueError, TypeError))
+    result = tryagain.call(unstable, exceptions=(ValueError, TypeError))
+
 
 Waittimes
 ~~~~~~~~~
@@ -111,8 +131,13 @@ functions.
             return 1.0
     tryagain.call(unstable, wait=no_first_wait)
 
+
 Retry calling a function with parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``tryagain.call``-function only supports a function reference as the
+``func`` parameter. To pass arguments to the unstable function you have to use
+one of the following idioms:
 
 .. code:: python
 
@@ -129,18 +154,29 @@ Retry calling a function with parameters
         return unstable(msg, some_arg=True)
     tryagain.call(call_unstable_function, wait=1.0)
 
+But it is much nicer to wrap your unstable function in the ``@retries``
+decorator.
+This way you can call your unstable function with parameters easily:
+
+
 Function decorator
 ~~~~~~~~~~~~~~~~~~
+
+Instead of using the ``tryagain.call`` function, you can use the ``retries``
+decorator.
 
 .. code:: python
 
     from tryagain import retries
-
-    @retries(max_attempts=3)
+    @retries(max_attempts=3, exceptions=(TypeError, ValueError))
     def unstable(arg1, arg2):
         # your unstable function here
 
-    unstable('foo', arg2='bar')
+    result = unstable('foo', arg2='bar')
+
+The decorator takes the same arguments as the ``call``-function
+except the ``func`` parameter.
+
 
 Hooks
 ~~~~~
@@ -170,7 +206,8 @@ The tryagain library features two hooks that can be used,
     'cleaning up'
     Error: Exception raised...
 
-.. |Build Status| image:: https://travis-ci.org/tfeldmann/tryagain.svg?branch=develop
+
+.. |Build Status| image:: https://travis-ci.org/tfeldmann/tryagain.svg?branch=master
    :target: https://travis-ci.org/tfeldmann/tryagain
-.. |Coverage Status| image:: https://coveralls.io/repos/github/tfeldmann/tryagain/badge.svg?branch=develop
-   :target: https://coveralls.io/github/tfeldmann/tryagain?branch=develop
+.. |Coverage Status| image:: https://coveralls.io/repos/github/tfeldmann/tryagain/badge.svg?branch=master
+   :target: https://coveralls.io/github/tfeldmann/tryagain?branch=master
