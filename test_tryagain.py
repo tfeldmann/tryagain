@@ -37,6 +37,22 @@ def test_raise_after_retry():
         tryagain.call(_always_raise_exception, max_attempts=2)
 
 
+def test_wait_time():
+
+    def works_on_second_try():
+        if ns.count == 0:
+            ns.count = 1
+            raise ValueError
+        return True
+
+    ns = Namespace()
+    ns.count = 0
+
+    with mock.patch('time.sleep') as mock_sleep:
+        assert tryagain.call(works_on_second_try, wait=1.2) is True
+        mock_sleep.assert_called_once_with(1.2)
+
+
 def test_custom_wait_function():
     def mywait(attempt):
         global counter
