@@ -315,3 +315,49 @@ def test_multiple_exceptions():
     ns = Namespace()
     ns.count = 0
     assert unstable(pass_on_count=5) is True
+
+
+def test_exception_in_wait_function():
+
+    def wait(attempt):
+        raise ValueError('Exception in wait function')
+
+    with pytest.raises(ValueError):
+        tryagain.call(_raise_exception, wait=wait)
+
+
+def test_exception_in_cleanup_hook():
+
+    def cleanup():
+        raise ValueError('Exception in cleanup')
+
+    with pytest.raises(ValueError):
+        tryagain.call(_raise_exception, cleanup_hook=cleanup)
+
+
+def test_exception_in_pre_retry_hook():
+
+    def pre_retry():
+        raise ValueError('Exception in pre_retry hook')
+
+    with pytest.raises(ValueError):
+        tryagain.call(_raise_exception, pre_retry_hook=pre_retry)
+
+
+def test_callable_hooks():
+    def wait():
+        # parameter 'attempt' is missing
+        pass
+
+    def pre_retry(too, many, arguments):
+        pass
+
+    def cleanup(too, many, arguments):
+        pass
+
+    with pytest.raises(TypeError):
+        tryagain.call(_raise_exception, wait=wait)
+    with pytest.raises(TypeError):
+        tryagain.call(_raise_exception, pre_retry_hook=pre_retry)
+    with pytest.raises(TypeError):
+        tryagain.call(_raise_exception, cleanup_hook=cleanup)
