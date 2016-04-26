@@ -272,12 +272,16 @@ def test_decorator_fails():
 
 def test_unexpected_exception():
 
-    @tryagain.retries(max_attempts=5)
+    @tryagain.retries(max_attempts=5, exceptions=(TypeError, ValueError))
     def unstable():
+        ns.count += 1
         raise EnvironmentError()
 
+    ns = Namespace()
+    ns.count = 0
     with pytest.raises(EnvironmentError):
         unstable()
+    assert ns.count == 1
 
 
 def test_multiple_exceptions():
