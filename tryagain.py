@@ -9,7 +9,8 @@
 """ tryagain: A simple and pythonic retry helper
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Full documentation is at http://tryagain.readthedocs.org
+    Repository and documentation:
+    https://github.com/tfeldmann/tryagain
 
     :license: MIT, see LICENSE for more details.
 """
@@ -19,7 +20,7 @@ import functools
 logger = logging.getLogger('tryagain')
 
 
-__version__ = '0.9'
+__version__ = '1.0'
 
 
 # this code is taken from the itertools.repeat documentation. The function
