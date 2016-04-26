@@ -175,7 +175,7 @@ def test_logging():
     with mock.patch.object(logger, 'debug') as mock_debug:
         assert tryagain.call(wrapped_unstable) is True
         mock_debug.assert_called_once_with(
-           'Attempt 1 at calling unstable failed (Exception message)')
+            'Attempt 1 at calling unstable failed (Exception message)')
 
 
 def test_logging_limited_attempts():
@@ -195,7 +195,7 @@ def test_logging_limited_attempts():
     with mock.patch.object(logger, 'debug') as mock_debug:
         assert tryagain.call(wrapped_unstable, max_attempts=5) is True
         mock_debug.assert_called_once_with(
-           'Attempt 1 / 5 at calling unstable failed (Exception message)')
+            'Attempt 1 / 5 at calling unstable failed (Exception message)')
 
 
 def test_decorator():
