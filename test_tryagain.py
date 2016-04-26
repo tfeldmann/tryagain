@@ -4,24 +4,17 @@ import logging
 import tryagain
 import functools
 
-# TODO:
-# - test with uncallable hooks, function and wait func
-# - test exceptions in hooks
 
-counter = 0
+class Namespace:
+    pass
 
 
 def _return_true():
     return True
 
 
-def _always_raise_exception():
+def _raise_exception():
     raise Exception()
-
-
-def _reset_counter():
-    global counter
-    counter = 0
 
 
 def test_call_once():
@@ -34,7 +27,7 @@ def test_call_twice():
 
 def test_raise_after_retry():
     with pytest.raises(Exception):
-        tryagain.call(_always_raise_exception, max_attempts=2)
+        tryagain.call(_raise_exception, max_attempts=2)
 
 
 def test_wait_time():
@@ -54,16 +47,16 @@ def test_wait_time():
 
 
 def test_custom_wait_function():
+
     def mywait(attempt):
-        global counter
-        counter = attempt
+        ns.counter = attempt
         return 0
 
-    _reset_counter()
+    ns = Namespace()
+    ns.counter = 0
     with pytest.raises(Exception):
-        assert tryagain.call(
-            _always_raise_exception, wait=mywait, max_attempts=2) is None
-    assert counter == 1
+        tryagain.call(_raise_exception, wait=mywait, max_attempts=2)
+    assert ns.counter == 1
 
 
 def test_repeat():
@@ -86,10 +79,6 @@ def test_attempts():
         tryagain.call(_return_true, max_attempts=0)
     assert tryagain.call(_return_true, max_attempts=None)
     assert tryagain.call(_return_true, max_attempts=1)
-
-
-class Namespace:
-    pass
 
 
 def test_full_execution():
