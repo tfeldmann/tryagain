@@ -14,8 +14,8 @@ are controlling devices which only seem to listen on the second try -
 prepare for the next call. You can set a waittime between retries or
 specify your own waittime function to realize exponential waittimes etc.
 
-``tryagain`` is lightweight, fully tested, MIT licensed and comes as a
-single python file with no dependencies.
+``tryagain`` is lightweight, fully tested, MIT licensed and comes as a single
+python file with no dependencies. It supports Python 2.6+ and 3.2+.
 
 To install, run ``pip install tryagain``.
 
