@@ -278,3 +278,20 @@ def test_unexpected_exception():
 
     with pytest.raises(EnvironmentError):
         unstable()
+
+
+def test_multiple_exceptions():
+
+    @tryagain.retries(exceptions=(ValueError, OSError))
+    def unstable(pass_on_count=2):
+        ns.count += 1
+        if ns.count == 1:
+            raise OSError
+        elif ns.count < pass_on_count:
+            raise ValueError
+        else:
+            return True
+
+    ns = Namespace()
+    ns.count = 0
+    assert unstable(pass_on_count=5) is True

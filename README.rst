@@ -17,7 +17,7 @@ specify your own waittime function to realize exponential waittimes etc.
 ``tryagain`` is lightweight, fully tested, MIT licensed and comes as a
 single python file with no dependencies.
 
-To install, run ``pip install tryagain``. (Does not work yet.)
+To install, run ``pip install tryagain``.
 
 Basic syntax
 ------------
@@ -78,7 +78,7 @@ Retry calling an unstable function
     tryagain.call(unstable, max_attempts=5)
 
     # only retry after specific exceptions
-    tryagain.call(unstable, exceptions=[ValueError, TypeError])
+    tryagain.call(unstable, exceptions=(ValueError, TypeError))
 
 Waittimes
 ~~~~~~~~~
