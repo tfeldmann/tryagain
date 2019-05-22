@@ -17,10 +17,11 @@
 import time
 import logging
 import functools
-logger = logging.getLogger('tryagain')
+
+logger = logging.getLogger("tryagain")
 
 
-__version__ = '1.0'
+__version__ = "1.0"
 
 
 # this code is taken from the itertools.repeat documentation. The function
@@ -39,11 +40,17 @@ def _repeat(obj, times=None):
 def _assert_callable(func, allow_none=True):
     if not (func is None and allow_none):
         if not callable(func):
-            raise TypeError('{0} is not callable'.format(func))
+            raise TypeError("{0} is not callable".format(func))
 
 
-def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
-         cleanup_hook=None, pre_retry_hook=None):
+def call(
+    func,
+    max_attempts=None,
+    exceptions=Exception,
+    wait=0.0,
+    cleanup_hook=None,
+    pre_retry_hook=None,
+):
     """ :param func (callable):
             The function to retry. No arguments are passed to this function.
             If your function requires arguments, consider defining a separate
@@ -94,7 +101,7 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
     _assert_callable(cleanup_hook, allow_none=True)
     _assert_callable(pre_retry_hook, allow_none=True)
     if not (max_attempts is None or max_attempts >= 1):
-        raise ValueError('max_attempts must be None or an integer >= 1')
+        raise ValueError("max_attempts must be None or an integer >= 1")
 
     # if the user sets the waittime to a fixed value (int or float) we create
     # a function which always returns this fixed value. This way we avoid
@@ -104,11 +111,14 @@ def call(func, max_attempts=None, exceptions=Exception, wait=0.0,
 
     def log_failed_attempt(attempt, error):
         if max_attempts is None:
-            nr_display = '{0}'.format(attempt)
+            nr_display = "{0}".format(attempt)
         else:
-            nr_display = '{0} / {1}'.format(attempt, max_attempts)
-        logger.debug('Attempt {nr} at calling {func} failed ({msg})'
-                     .format(nr=nr_display, func=func, msg=error))
+            nr_display = "{0} / {1}".format(attempt, max_attempts)
+        logger.debug(
+            "Attempt {nr} at calling {func} failed ({msg})".format(
+                nr=nr_display, func=func, msg=error
+            )
+        )
 
     for attempt, f in enumerate(_repeat(func, max_attempts), start=1):
         try:
@@ -130,7 +140,8 @@ def retries(*deco_args, **deco_kwargs):
     def retries_decorator(func):
         @functools.wraps(func)
         def func_wrapper(*args, **kwargs):
-            return call(
-                lambda: func(*args, **kwargs), *deco_args, **deco_kwargs)
+            return call(lambda: func(*args, **kwargs), *deco_args, **deco_kwargs)
+
         return func_wrapper
+
     return retries_decorator

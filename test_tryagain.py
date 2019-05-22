@@ -31,7 +31,6 @@ def test_raise_after_retry():
 
 
 def test_wait_time():
-
     def works_on_second_try():
         if ns.count == 0:
             ns.count = 1
@@ -41,13 +40,12 @@ def test_wait_time():
     ns = Namespace()
     ns.count = 0
 
-    with mock.patch('time.sleep') as mock_sleep:
+    with mock.patch("time.sleep") as mock_sleep:
         assert tryagain.call(works_on_second_try, wait=1.2) is True
         mock_sleep.assert_called_once_with(1.2)
 
 
 def test_custom_wait_function():
-
     def mywait(attempt):
         ns.counter = attempt
         return 0
@@ -60,9 +58,7 @@ def test_custom_wait_function():
 
 
 def test_repeat():
-    assert (
-        list(tryagain._repeat('x', times=10)) ==
-        ['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'])
+    assert list(tryagain._repeat("x", times=10)) == ["x"] * 10
 
 
 def test_is_callable():
@@ -89,30 +85,42 @@ def test_full_execution():
     def unstable():
         ns.count += 1
         if ns.count == 3:
-            actions.append('success %s' % ns.count)
-            return 'result %s' % ns.count
+            actions.append("success %s" % ns.count)
+            return "result %s" % ns.count
         else:
-            actions.append('fail %s' % ns.count)
+            actions.append("fail %s" % ns.count)
             raise Exception
 
     def cleanup():
-        actions.append('cleanup %s' % ns.count)
+        actions.append("cleanup %s" % ns.count)
 
     def pre_retry():
-        actions.append('pre_retry %s' % ns.count)
+        actions.append("pre_retry %s" % ns.count)
 
     def wait(attempt):
-        actions.append('wait %s' % attempt)
+        actions.append("wait %s" % attempt)
         return 0
 
-    result = tryagain.call(unstable, wait=wait, max_attempts=5,
-                           cleanup_hook=cleanup, pre_retry_hook=pre_retry)
+    result = tryagain.call(
+        unstable,
+        wait=wait,
+        max_attempts=5,
+        cleanup_hook=cleanup,
+        pre_retry_hook=pre_retry,
+    )
     print(actions)
     assert actions == [
-        'fail 1', 'cleanup 1', 'wait 1', 'pre_retry 1',
-        'fail 2', 'cleanup 2', 'wait 2', 'pre_retry 2',
-        'success 3']
-    assert result == 'result 3'
+        "fail 1",
+        "cleanup 1",
+        "wait 1",
+        "pre_retry 1",
+        "fail 2",
+        "cleanup 2",
+        "wait 2",
+        "pre_retry 2",
+        "success 3",
+    ]
+    assert result == "result 3"
 
 
 def test_full_execution_decorator():
@@ -121,33 +129,41 @@ def test_full_execution_decorator():
     ns.count = 0
 
     def cleanup():
-        actions.append('cleanup %s' % ns.count)
+        actions.append("cleanup %s" % ns.count)
 
     def pre_retry():
-        actions.append('pre_retry %s' % ns.count)
+        actions.append("pre_retry %s" % ns.count)
 
     def wait(attempt):
-        actions.append('wait %s' % attempt)
+        actions.append("wait %s" % attempt)
         return 0
 
-    @tryagain.retries(wait=wait, max_attempts=5,
-                      cleanup_hook=cleanup, pre_retry_hook=pre_retry)
+    @tryagain.retries(
+        wait=wait, max_attempts=5, cleanup_hook=cleanup, pre_retry_hook=pre_retry
+    )
     def unstable():
         ns.count += 1
         if ns.count == 3:
-            actions.append('success %s' % ns.count)
-            return 'result %s' % ns.count
+            actions.append("success %s" % ns.count)
+            return "result %s" % ns.count
         else:
-            actions.append('fail %s' % ns.count)
+            actions.append("fail %s" % ns.count)
             raise Exception
 
     result = unstable()
     print(actions)
     assert actions == [
-        'fail 1', 'cleanup 1', 'wait 1', 'pre_retry 1',
-        'fail 2', 'cleanup 2', 'wait 2', 'pre_retry 2',
-        'success 3']
-    assert result == 'result 3'
+        "fail 1",
+        "cleanup 1",
+        "wait 1",
+        "pre_retry 1",
+        "fail 2",
+        "cleanup 2",
+        "wait 2",
+        "pre_retry 2",
+        "success 3",
+    ]
+    assert result == "result 3"
 
 
 class reprwrapper(object):
@@ -172,15 +188,16 @@ def test_logging():
         if ns.count == 2:
             return True
         else:
-            raise Exception('Exception message')
+            raise Exception("Exception message")
 
-    wrapped_unstable = reprwrapper('unstable', unstable)
+    wrapped_unstable = reprwrapper("unstable", unstable)
 
-    logger = logging.getLogger('tryagain')
-    with mock.patch.object(logger, 'debug') as mock_debug:
+    logger = logging.getLogger("tryagain")
+    with mock.patch.object(logger, "debug") as mock_debug:
         assert tryagain.call(wrapped_unstable) is True
         mock_debug.assert_called_once_with(
-            'Attempt 1 at calling unstable failed (Exception message)')
+            "Attempt 1 at calling unstable failed (Exception message)"
+        )
 
 
 def test_logging_limited_attempts():
@@ -192,15 +209,16 @@ def test_logging_limited_attempts():
         if ns.count == 2:
             return True
         else:
-            raise Exception('Exception message')
+            raise Exception("Exception message")
 
-    wrapped_unstable = reprwrapper('unstable', unstable)
+    wrapped_unstable = reprwrapper("unstable", unstable)
 
-    logger = logging.getLogger('tryagain')
-    with mock.patch.object(logger, 'debug') as mock_debug:
+    logger = logging.getLogger("tryagain")
+    with mock.patch.object(logger, "debug") as mock_debug:
         assert tryagain.call(wrapped_unstable, max_attempts=5) is True
         mock_debug.assert_called_once_with(
-            'Attempt 1 / 5 at calling unstable failed (Exception message)')
+            "Attempt 1 / 5 at calling unstable failed (Exception message)"
+        )
 
 
 def test_decorator():
@@ -213,7 +231,7 @@ def test_decorator():
         if ns.count == 2:
             return True
         else:
-            raise Exception('Exception message')
+            raise Exception("Exception message")
 
     assert tryagain.call(unstable)
 
@@ -228,15 +246,13 @@ def test_decorator_with_parameters():
         if ns.count == 2:
             return True
         else:
-            raise Exception('Exception message')
+            raise Exception("Exception message")
 
     assert tryagain.call(unstable)
 
 
 def test_decorator_in_class():
-
     class MyClass:
-
         def __init__(self):
             self.count = 0
 
@@ -246,7 +262,7 @@ def test_decorator_in_class():
             if self.count == pass_on_count:
                 return True
             else:
-                raise Exception('Exception message')
+                raise Exception("Exception message")
 
     with pytest.raises(Exception):
         c1 = MyClass()
@@ -266,7 +282,7 @@ def test_decorator_fails():
         if ns.count == pass_on_count:
             return True
         else:
-            raise Exception('Exception message')
+            raise Exception("Exception message")
 
     with pytest.raises(Exception):
         unstable(pass_on_count=10)
@@ -276,7 +292,6 @@ def test_decorator_fails():
 
 
 def test_unexpected_exception():
-
     @tryagain.retries(max_attempts=5, exceptions=(TypeError, ValueError))
     def unstable():
         ns.count += 1
@@ -290,7 +305,6 @@ def test_unexpected_exception():
 
 
 def test_multiple_exceptions():
-
     @tryagain.retries(exceptions=(ValueError, OSError))
     def unstable(pass_on_count=2):
         ns.count += 1
@@ -307,27 +321,24 @@ def test_multiple_exceptions():
 
 
 def test_exception_in_wait_function():
-
     def wait(attempt):
-        raise ValueError('Exception in wait function')
+        raise ValueError("Exception in wait function")
 
     with pytest.raises(ValueError):
         tryagain.call(_raise_exception, wait=wait)
 
 
 def test_exception_in_cleanup_hook():
-
     def cleanup():
-        raise ValueError('Exception in cleanup')
+        raise ValueError("Exception in cleanup")
 
     with pytest.raises(ValueError):
         tryagain.call(_raise_exception, cleanup_hook=cleanup)
 
 
 def test_exception_in_pre_retry_hook():
-
     def pre_retry():
-        raise ValueError('Exception in pre_retry hook')
+        raise ValueError("Exception in pre_retry hook")
 
     with pytest.raises(ValueError):
         tryagain.call(_raise_exception, pre_retry_hook=pre_retry)
